@@ -3,14 +3,10 @@
  * Calistirmak icin: npx prisma db seed
  */
 import { PrismaClient } from '../src/generated/prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
-import path from 'path'
 
-const rawUrl = process.env.DATABASE_URL ?? 'file:./dev.db'
-const dbPath = rawUrl.replace(/^file:/, '')
-const absoluteDbPath = path.isAbsolute(dbPath) ? dbPath : path.resolve(process.cwd(), dbPath)
-const adapter = new PrismaBetterSqlite3({ url: absoluteDbPath })
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
