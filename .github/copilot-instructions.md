@@ -1,3 +1,5 @@
+# Copilot Instructions
+
 ## Project Overview
 
 Bu proje **operasyon-takip** (Operasyon Takip Sistemi) adinda bir **dashboard** uygulamasidir.
@@ -10,13 +12,10 @@ Uygulama, bir organizasyondaki **operasyonlarin adim adim tanimlanmasini, iscile
 ## Uygulama Ne Is Yapar?
 
 ### Temel Amac
-
 Yoneticiler, bir operasyonu (ornegin bir uretim sureci, bir proje, bir siparis akisi) **birden fazla sirali adima** boler. Her adimi bir **isciye** atar. Isciler kendi panellerinde yalnizca kendilerine atanan ve **sirasi gelen** adimi gorur. Adimi tamamladiklarinda bir sonraki adim, o adima atanan iscinin ekranina duser. Boylece operasyon bastan sona sirali bir sekilde ilerler.
 
 ### Gercek Hayat Ornegi
-
 Bir uretim hatti dusunun:
-
 1. **Adim 1** - Hammadde Kesim -> Isci A'ya atandi
 2. **Adim 2** - Montaj -> Isci B'ye atandi
 3. **Adim 3** - Kalite Kontrol -> Isci C'ye atandi
@@ -29,7 +28,6 @@ Operasyon basladiginda **yalnizca Isci A** ekraninda "Hammadde Kesim" kartini go
 ## Kullanici Rolleri
 
 ### 1. Yonetici (Admin)
-
 - Sisteme giris yapar ve **yonetici dashboard**'unu gorur.
 - **Operasyon olusturabilir**: Operasyona isim, aciklama ve oncelik seviyesi verir.
 - **Adim tanimlayabilir**: Her operasyona sirali adimlar ekler. Her adimin bir adi, aciklamasi ve sirasi vardir.
@@ -39,7 +37,6 @@ Operasyon basladiginda **yalnizca Isci A** ekraninda "Hammadde Kesim" kartini go
 - **Isci yonetimi yapabilir**: Sisteme yeni isci ekleyebilir, mevcut iscileri duzenleyebilir.
 
 ### 2. Isci (Worker)
-
 - Sisteme giris yapar ve **isci dashboard**'unu gorur.
 - Ekraninda yalnizca **kendisine atanmis ve sirasi gelmis aktif adimlari** kart olarak gorur.
 - Her kartta adimin adi, aciklamasi, ait oldugu operasyon bilgisi ve oncelik seviyesi yer alir.
@@ -52,7 +49,6 @@ Operasyon basladiginda **yalnizca Isci A** ekraninda "Hammadde Kesim" kartini go
 ## Veri Modelleri
 
 ### User (Kullanici)
-
 - id: string (cuid) - Benzersiz kullanici ID'si
 - name: string - Kullanici adi soyadi
 - email: string (unique) - E-posta adresi
@@ -62,7 +58,6 @@ Operasyon basladiginda **yalnizca Isci A** ekraninda "Hammadde Kesim" kartini go
 - updatedAt: datetime - Son guncellenme tarihi
 
 ### Operation (Operasyon)
-
 - id: string (cuid) - Benzersiz operasyon ID'si
 - title: string - Operasyon basligi
 - description: string (opsiyonel) - Operasyon aciklamasi
@@ -74,7 +69,6 @@ Operasyon basladiginda **yalnizca Isci A** ekraninda "Hammadde Kesim" kartini go
 - Iliskiler: steps (Step[]), creator (User)
 
 ### Step (Adim)
-
 - id: string (cuid) - Benzersiz adim ID'si
 - operationId: string - Ait oldugu operasyonun ID'si (foreign key -> Operation)
 - title: string - Adim basligi
@@ -265,32 +259,27 @@ operasyon-takip/
 ## Mimari Kararlar ve Aciklamalar
 
 ### 1. Server Actions vs API Routes
-
 - **Server Actions** (src/actions/): Tum form submit islemleri, veri mutasyonlari (CRUD) icin kullanilir. Dogrudan form'larin action prop'una baglanir veya useActionState ile kullanilir.
 - **API Routes** (src/app/api/): Yalnizca NextAuth.js handler'i icin kullanilir. Dis entegrasyon gerekmedikce yeni API route eklenmez.
 - **Neden?**: Server Actions, Next.js App Router'in dogal yaklasimi. Progressive enhancement destekler, tip guvenligi saglar ve gereksiz client-side fetch kodunu ortadan kaldirir.
 
 ### 2. Veri Cekme Katmani (src/lib/queries/)
-
 - Server Component'ler icinde dogrudan cagrilacak saf fonksiyonlar.
 - Her fonksiyon Prisma client'i kullanarak veritabanindan veri ceker.
 - Bu fonksiyonlar asla component dosyalarinda inline yazilmaz; her zaman queries/ altindan import edilir.
 - Ornek: getOperations(), getOperationById(id), getActiveStepsByWorker(userId), getWorkers()
 
 ### 3. Validasyon Katmani (src/lib/validations/)
-
 - Her entity icin ayri Zod semalari.
 - Hem Server Actions'da (backend validation) hem de form'larda (client-side validation) ayni sema kullanilir.
 - Ornek: createOperationSchema, updateOperationSchema, createStepSchema, loginSchema
 
 ### 4. Middleware (src/middleware.ts)
-
-- Korunan route'lar: /dashboard/\* -> oturum acmamis kullanicilar /login'e yonlendirilir.
-- Rol bazli erisim: /dashboard/admin/_ -> sadece admin, /dashboard/worker/_ -> sadece worker.
+- Korunan route'lar: /dashboard/* -> oturum acmamis kullanicilar /login'e yonlendirilir.
+- Rol bazli erisim: /dashboard/admin/* -> sadece admin, /dashboard/worker/* -> sadece worker.
 - Auth olmayan sayfalar: /login, / -> oturum acmis kullanici dashboard'a yonlendirilir.
 
 ### 5. Auth Yapisi
-
 - NextAuth.js v5 (Auth.js) kullanilir.
 - src/lib/auth.ts: Ana yapilandirma (Credentials provider, Prisma adapter, session callbacks).
 - src/lib/auth.config.ts: Edge-uyumlu yapilandirma (middleware icin, DB erisimi olmadan).
@@ -298,7 +287,6 @@ operasyon-takip/
 - Session strategy: JWT (veritabaninda session tutulmaz, performans icin).
 
 ### 6. Component Mimarisi
-
 - **Server Components** (varsayilan): Veri ceken, layout saglayan bilesenler. DB query'leri burada yapilir.
 - **Client Components** ("use client"): Form'lar, interaktif UI, event handler'lar gerektiren bilesenler.
 - src/components/ui/: Projede tekrar kullanilan genel UI bilesenleri. Hepsi "use client" olabilir.
@@ -307,7 +295,6 @@ operasyon-takip/
 - src/components/worker/: ActiveStepCard client (buton interaksiyonu), CompletedStepCard server olabilir.
 
 ### 7. Provider Yapisi
-
 - src/providers/Providers.tsx: Root layout'ta children etrafini saran tek wrapper.
 - Icerir: NextAuth SessionProvider, React Hot Toast Toaster.
 - Root layout.tsx icerisinde <Providers>{children}</Providers> seklinde kullanilir.
@@ -317,31 +304,28 @@ operasyon-takip/
 ## Sayfa Yapisi (Route Structure) - Detayli
 
 ### Genel Sayfalar
-
-| Route  | Dosya                  | Aciklama                                |
-| ------ | ---------------------- | --------------------------------------- |
-| /      | src/app/page.tsx       | Login'e redirect (server-side redirect) |
-| /login | src/app/login/page.tsx | Giris sayfasi (LoginForm bileseni)      |
+| Route | Dosya | Aciklama |
+|-------|-------|----------|
+| / | src/app/page.tsx | Login'e redirect (server-side redirect) |
+| /login | src/app/login/page.tsx | Giris sayfasi (LoginForm bileseni) |
 
 ### Admin Sayfalari
-
-| Route                                 | Dosya                                                 | Aciklama                                                              |
-| ------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------- |
-| /dashboard/admin                      | src/app/dashboard/admin/page.tsx                      | Ozet istatistikler (toplam operasyon, aktif, tamamlanan, isci sayisi) |
-| /dashboard/admin/operations           | src/app/dashboard/admin/operations/page.tsx           | Operasyon listesi (filtreleme: durum, oncelik)                        |
-| /dashboard/admin/operations/new       | src/app/dashboard/admin/operations/new/page.tsx       | Yeni operasyon + adimlar olusturma                                    |
-| /dashboard/admin/operations/[id]      | src/app/dashboard/admin/operations/[id]/page.tsx      | Operasyon detay (timeline, baslatma, iptal)                           |
-| /dashboard/admin/operations/[id]/edit | src/app/dashboard/admin/operations/[id]/edit/page.tsx | Operasyon duzenleme                                                   |
-| /dashboard/admin/workers              | src/app/dashboard/admin/workers/page.tsx              | Isci listesi                                                          |
-| /dashboard/admin/workers/new          | src/app/dashboard/admin/workers/new/page.tsx          | Yeni isci ekleme                                                      |
-| /dashboard/admin/workers/[id]/edit    | src/app/dashboard/admin/workers/[id]/edit/page.tsx    | Isci duzenleme                                                        |
+| Route | Dosya | Aciklama |
+|-------|-------|----------|
+| /dashboard/admin | src/app/dashboard/admin/page.tsx | Ozet istatistikler (toplam operasyon, aktif, tamamlanan, isci sayisi) |
+| /dashboard/admin/operations | src/app/dashboard/admin/operations/page.tsx | Operasyon listesi (filtreleme: durum, oncelik) |
+| /dashboard/admin/operations/new | src/app/dashboard/admin/operations/new/page.tsx | Yeni operasyon + adimlar olusturma |
+| /dashboard/admin/operations/[id] | src/app/dashboard/admin/operations/[id]/page.tsx | Operasyon detay (timeline, baslatma, iptal) |
+| /dashboard/admin/operations/[id]/edit | src/app/dashboard/admin/operations/[id]/edit/page.tsx | Operasyon duzenleme |
+| /dashboard/admin/workers | src/app/dashboard/admin/workers/page.tsx | Isci listesi |
+| /dashboard/admin/workers/new | src/app/dashboard/admin/workers/new/page.tsx | Yeni isci ekleme |
+| /dashboard/admin/workers/[id]/edit | src/app/dashboard/admin/workers/[id]/edit/page.tsx | Isci duzenleme |
 
 ### Worker Sayfalari
-
-| Route                     | Dosya                                     | Aciklama                                    |
-| ------------------------- | ----------------------------------------- | ------------------------------------------- |
-| /dashboard/worker         | src/app/dashboard/worker/page.tsx         | Aktif adim kartlari (sirasi gelen, atanmis) |
-| /dashboard/worker/history | src/app/dashboard/worker/history/page.tsx | Tamamlanmis adimlar gecmisi                 |
+| Route | Dosya | Aciklama |
+|-------|-------|----------|
+| /dashboard/worker | src/app/dashboard/worker/page.tsx | Aktif adim kartlari (sirasi gelen, atanmis) |
+| /dashboard/worker/history | src/app/dashboard/worker/history/page.tsx | Tamamlanmis adimlar gecmisi |
 
 ---
 
@@ -361,36 +345,34 @@ operasyon-takip/
 
 ## Teknoloji Kararlari
 
-| Kategori      | Teknoloji             | Versiyon/Not                                 |
-| ------------- | --------------------- | -------------------------------------------- |
-| Framework     | Next.js               | 16 (App Router)                              |
-| Dil           | TypeScript            | Strict mode                                  |
-| Styling       | Tailwind CSS          | 4                                            |
-| Auth          | NextAuth.js (Auth.js) | v5, JWT strategy, Credentials provider       |
-| Veritabani    | Prisma + SQLite       | Gelistirme icin SQLite, prod icin PostgreSQL |
-| Form Yonetimi | React Hook Form       | Zod resolver ile                             |
-| Validasyon    | Zod                   | Hem client hem server tarafinda              |
-| Bildirimler   | React Hot Toast       | Basari/hata bildirimleri                     |
-| Sifreleme     | bcryptjs              | Parola hashleme                              |
+| Kategori | Teknoloji | Versiyon/Not |
+|----------|-----------|--------------|
+| Framework | Next.js | 16 (App Router) |
+| Dil | TypeScript | Strict mode |
+| Styling | Tailwind CSS | 4 |
+| Auth | NextAuth.js (Auth.js) | v5, JWT strategy, Credentials provider |
+| Veritabani | Prisma + SQLite | Gelistirme icin SQLite, prod icin PostgreSQL |
+| Form Yonetimi | React Hook Form | Zod resolver ile |
+| Validasyon | Zod | Hem client hem server tarafinda |
+| Bildirimler | React Hot Toast | Basari/hata bildirimleri |
+| Sifreleme | bcryptjs | Parola hashleme |
 
 ---
 
 ## Coding Guidelines
 
 ### Genel Kurallar
-
 - Tum dosyalarda **TypeScript** kullan, any tipinden kacin.
 - **App Router** convention'larini takip et (page.tsx, layout.tsx, loading.tsx, error.tsx, not-found.tsx).
 - Styling icin **Tailwind CSS** kullan (gerekmedikce CSS modules kullanma).
 - Varsayilan olarak **Server Components** kullan; sadece gerektiginde "use client" ekle.
-- Import'larda @/\* alias'ini kullan (src/ klasorune isaret eder).
+- Import'larda @/* alias'ini kullan (src/ klasorune isaret eder).
 - Temiz, okunabilir ve iyi belgelenmis kod yaz.
 - Her fonksiyon ve bilesen icin **JSDoc** yorumlari ekle.
 - Hata yonetimini (error handling) her zaman uygula - try/catch bloklari kullan.
 - Turkce yorum ve aciklamalar yaz.
 
 ### Veri Islemleri
-
 - Veri **cekme** (read): src/lib/queries/ altindaki fonksiyonlari Server Component'lerde dogrudan cagir.
 - Veri **mutasyonu** (create/update/delete): src/actions/ altindaki Server Actions'lari kullan.
 - **Asla** component dosyasinda dogrudan Prisma cagrisi yapma.
@@ -398,13 +380,11 @@ operasyon-takip/
 - Server Actions'da her zaman **auth kontrolu** yap (oturum ve rol dogrulama).
 
 ### Form Yonetimi
-
 - Form bilesenleri icin **React Hook Form** + **Zod resolver** kullan.
 - Ayni Zod semasini hem client (form validation) hem server (action validation) tarafinda kullan.
 - Form submit sonrasi revalidatePath veya redirect ile sayfayi guncelle.
 
 ### Stil Kurallari
-
 - cn() utility fonksiyonu ile kosullu class birlesimi yap (clsx + tailwind-merge).
 - Renk ve boyut varyantlari icin Tailwind class'larini kullan, inline style yazma.
 - Component'lerde className prop'u destekle (birlestirme icin).
@@ -413,17 +393,17 @@ operasyon-takip/
 
 ## Isimlendirme Konvansiyonlari (Naming Conventions)
 
-| Tur                       | Kural                    | Ornek                                                |
-| ------------------------- | ------------------------ | ---------------------------------------------------- |
-| React Component           | PascalCase               | `OperationCard.tsx`, `ActiveStepCard.tsx`            |
-| Hook                      | `use` prefix + camelCase | `useCurrentUser.ts`, `useAuth.ts`                    |
-| Server Action             | fiil + PascalCase        | `createOperation`, `startOperation`, `completeStep`  |
-| Query fonksiyonu          | `get`/`find` prefix      | `getOperations()`, `findOperationById()`             |
-| Zod semasi                | entity + islem + Schema  | `createOperationSchema`, `updateStepSchema`          |
-| TypeScript tipi/interface | PascalCase               | `Operation`, `Step`, `ActionResult`                  |
-| Sabit (constant)          | UPPER_SNAKE_CASE         | `PRIORITY_COLORS`, `STATUS_LABELS`                   |
-| Dosya (utility/lib)       | camelCase                | `db.ts`, `utils.ts`, `auth.ts`                       |
-| CSS class (dinamik)       | her zaman cn() ile       | `cn('base-class', condition && 'conditional-class')` |
+| Tur | Kural | Ornek |
+|-----|-------|-------|
+| React Component | PascalCase | `OperationCard.tsx`, `ActiveStepCard.tsx` |
+| Hook | `use` prefix + camelCase | `useCurrentUser.ts`, `useAuth.ts` |
+| Server Action | fiil + PascalCase | `createOperation`, `startOperation`, `completeStep` |
+| Query fonksiyonu | `get`/`find` prefix | `getOperations()`, `findOperationById()` |
+| Zod semasi | entity + islem + Schema | `createOperationSchema`, `updateStepSchema` |
+| TypeScript tipi/interface | PascalCase | `Operation`, `Step`, `ActionResult` |
+| Sabit (constant) | UPPER_SNAKE_CASE | `PRIORITY_COLORS`, `STATUS_LABELS` |
+| Dosya (utility/lib) | camelCase | `db.ts`, `utils.ts`, `auth.ts` |
+| CSS class (dinamik) | her zaman cn() ile | `cn('base-class', condition && 'conditional-class')` |
 
 ---
 
@@ -459,7 +439,7 @@ Her Server Action `ActionResult<T>` tipini dondurmelidir. Bu tip `src/types/inde
 // src/types/index.ts
 export type ActionResult<T = void> =
   | { success: true; data: T }
-  | { success: false; error: string; fieldErrors?: Record<string, string[]> };
+  | { success: false; error: string; fieldErrors?: Record<string, string[]> }
 ```
 
 Her Server Action basinda **mutlaka** auth + rol kontrolu yapilmalidir:
@@ -470,30 +450,23 @@ export async function createOperation(
   formData: FormData
 ): Promise<ActionResult<Operation>> {
   // 1. Auth kontrolu
-  const session = await auth();
-  if (!session?.user) return { success: false, error: "Yetkisiz erisim" };
-  if (session.user.role !== "admin")
-    return { success: false, error: "Sadece yoneticiler erisebilir" };
+  const session = await auth()
+  if (!session?.user) return { success: false, error: 'Yetkisiz erisim' }
+  if (session.user.role !== 'admin') return { success: false, error: 'Sadece yoneticiler erisebilir' }
 
   // 2. Zod validasyonu
-  const parsed = createOperationSchema.safeParse(Object.fromEntries(formData));
+  const parsed = createOperationSchema.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
-    return {
-      success: false,
-      error: "Gecersiz veri",
-      fieldErrors: parsed.error.flatten().fieldErrors,
-    };
+    return { success: false, error: 'Gecersiz veri', fieldErrors: parsed.error.flatten().fieldErrors }
   }
 
   // 3. DB islemi
   try {
-    const operation = await db.operation.create({
-      data: { ...parsed.data, createdBy: session.user.id },
-    });
-    revalidatePath("/dashboard/admin/operations");
-    return { success: true, data: operation };
+    const operation = await db.operation.create({ data: { ...parsed.data, createdBy: session.user.id } })
+    revalidatePath('/dashboard/admin/operations')
+    return { success: true, data: operation }
   } catch {
-    return { success: false, error: "Operasyon olusturulamadi" };
+    return { success: false, error: 'Operasyon olusturulamadi' }
   }
 }
 ```
@@ -511,13 +484,11 @@ Next.js App Router'da caching kurallari:
 
 ```ts
 // Dogru - query fonksiyonlarini cache() ile sar
-import { cache } from "react";
+import { cache } from 'react'
 
-export const getOperationById = cache(
-  async (id: string): Promise<Operation | null> => {
-    return db.operation.findUnique({ where: { id }, include: { steps: true } });
-  }
-);
+export const getOperationById = cache(async (id: string): Promise<Operation | null> => {
+  return db.operation.findUnique({ where: { id }, include: { steps: true } })
+})
 ```
 
 ---
@@ -535,14 +506,11 @@ Isci dashboard'u yeni aktif adimlar icin polling yapar:
 ```ts
 // src/components/worker/WorkerDashboardRefresher.tsx ("use client")
 useEffect(() => {
-  const interval = setInterval(() => router.refresh(), 30_000);
-  const onFocus = () => router.refresh();
-  document.addEventListener("visibilitychange", onFocus);
-  return () => {
-    clearInterval(interval);
-    document.removeEventListener("visibilitychange", onFocus);
-  };
-}, [router]);
+  const interval = setInterval(() => router.refresh(), 30_000)
+  const onFocus = () => router.refresh()
+  document.addEventListener('visibilitychange', onFocus)
+  return () => { clearInterval(interval); document.removeEventListener('visibilitychange', onFocus) }
+}, [router])
 ```
 
 ---
@@ -550,21 +518,17 @@ useEffect(() => {
 ## Guvenlik Kurallari
 
 ### IDOR Korumalı Prisma Sorguları
-
 Her zaman sorguya `userId` veya `role` kosulunu ekle — sadece ID ile sorgulama yapma:
 
 ```ts
 // Yanlis - baska kullanicinin adimini gorebilir
-const step = await db.step.findUnique({ where: { id } });
+const step = await db.step.findUnique({ where: { id } })
 
 // Dogru - yalnizca kendi atandigi adimi gorur
-const step = await db.step.findUnique({
-  where: { id, assignedTo: session.user.id },
-});
+const step = await db.step.findUnique({ where: { id, assignedTo: session.user.id } })
 ```
 
 ### Diger Guvenlik Kurallari
-
 - **Rate limiting**: Login endpoint'i icin basit rate limiting ekle (5 basarisiz deneme -> 15 dk bekleme).
 - **Input sanitizasyonu**: Zod validasyonu yeterlidir; `DOMPurify` gibi ek kutuphanelere gerek yok (SSR).
 - **Server Action CSRF**: Next.js Server Actions CSRF korumasini otomatik saglar; ekstra onlem gerekmez.
@@ -635,7 +599,6 @@ npx prisma db seed
 ```
 
 **Kurallar:**
-
 - Schema'da her degisiklik icin migration olustur; `db push` sadece prototipleme icin kullan.
 - Migration dosyalarini asla manuel duzenleme — Prisma tarafindan yonetilir.
 - Production'da `migrate dev` degil `migrate deploy` kullan.
@@ -645,20 +608,16 @@ npx prisma db seed
 ## Test Stratejisi
 
 ### Birim Testler (Jest + ts-jest)
-
 - `src/lib/utils.ts` ve `src/lib/validations/` icindeki saf fonksiyonlar test edilir.
 - Test dosyalari yaninda tutulur: `utils.test.ts`, `operation.test.ts`
 - Prisma'yi mock'la: `jest.mock('@/lib/db')`
 
 ### Server Action Testleri
-
 - Her action'in happy path ve error case'leri test edilir.
 - Auth mock'lanir, Prisma mock'lanir.
 
 ### E2E Testler (Playwright)
-
 Kritik akislar otomatik test edilir:
-
 1. Login (admin + worker)
 2. Operasyon olusturma ve baslatma
 3. Isci adim tamamlama akisi (end-to-end workflow)
@@ -672,7 +631,6 @@ pnpm test:coverage  # Coverage raporu
 ```
 
 Test dosya yapisi:
-
 ```
 src/
   lib/
