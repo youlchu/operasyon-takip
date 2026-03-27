@@ -2,6 +2,7 @@
  * Gelistirme ortami icin ornek veri (seed data).
  * Calistirmak icin: npx prisma db seed
  */
+import 'dotenv/config'
 import { PrismaClient } from '../src/generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
