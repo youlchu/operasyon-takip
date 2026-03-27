@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { notFound } from 'next/navigation'
 import { getOperationById } from '@/lib/queries/operations'
 import { getWorkers } from '@/lib/queries/workers'

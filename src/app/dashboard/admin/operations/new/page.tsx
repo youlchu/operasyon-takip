@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getWorkers } from '@/lib/queries/workers'
 import { OperationForm } from '@/components/operations/OperationForm'
 

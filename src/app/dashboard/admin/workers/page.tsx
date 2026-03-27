@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { getWorkers } from '@/lib/queries/workers'
 import { EmptyState } from '@/components/ui/EmptyState'

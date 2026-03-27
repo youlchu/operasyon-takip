@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { getOperations } from '@/lib/queries/operations'
 import { OperationCard } from '@/components/operations/OperationCard'

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getAdminStats } from '@/lib/queries/operations'
 
 /**

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { notFound } from 'next/navigation'
 import { getWorkerById } from '@/lib/queries/workers'
 import { WorkerForm } from '@/components/workers/WorkerForm'

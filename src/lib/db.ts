@@ -1,6 +1,5 @@
 import { PrismaClient } from '@/generated/prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
-import path from 'path'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 /**
  * Prisma Client singleton instance.
@@ -12,15 +11,7 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 function createPrismaClient(): PrismaClient {
-  // DATABASE_URL "file:./dev.db" formatinda gelir; "file:" onekini cikartiyoruz
-  const rawUrl = process.env.DATABASE_URL ?? 'file:./dev.db'
-  const relativePath = rawUrl.replace(/^file:/, '')
-  const absolutePath = path.isAbsolute(relativePath)
-    ? relativePath
-    : path.resolve(process.cwd(), relativePath)
-
-  const adapter = new PrismaBetterSqlite3({ url: absolutePath })
-
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
   return new PrismaClient({ adapter })
 }
 
