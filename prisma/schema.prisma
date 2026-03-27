@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String   @default("worker") // "admin" | "worker"
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Iliskiler
+  createdOperations Operation[] @relation("CreatedBy")
+  assignedSteps     Step[]      @relation("AssignedTo")
+  completedSteps    Step[]      @relation("CompletedBy")
+}
+
+model Operation {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  priority    String   @default("medium") // "low" | "medium" | "high" | "critical"
+  status      String   @default("draft")  // "draft" | "in_progress" | "completed" | "cancelled"
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Iliskiler
+  creator User   @relation("CreatedBy", fields: [createdBy], references: [id])
+  steps   Step[]
+}
+
+model Step {
+  id          String    @id @default(cuid())
+  operationId String
+  title       String
+  description String?
+  order       Int
+  status      String    @default("pending") // "pending" | "active" | "completed"
+  assignedTo  String
+  completedAt DateTime?
+  completedBy String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Iliskiler
+  operation   Operation @relation(fields: [operationId], references: [id], onDelete: Cascade)
+  assignee    User      @relation("AssignedTo", fields: [assignedTo], references: [id])
+  completer   User?     @relation("CompletedBy", fields: [completedBy], references: [id])
+}
